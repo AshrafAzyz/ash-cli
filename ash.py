@@ -3,6 +3,7 @@ import platform
 import os
 import shutil
 import datetime
+import status
 
 parser = argparse.ArgumentParser(description = "A Linux system information CLI.")
 
@@ -24,49 +25,32 @@ subparsers.add_parser(
 	help="Show systemd services"
 )
 
-def get_memory_info():
-    data = open('/proc/meminfo').read()
+def get_os_release():
+    #get info
+    with open('/etc/os-release') as file:
+        data = file.read()
+
     info = {}
 
     for line in data.splitlines():
-        key, value = line.split(":", 1)
-        value = int(value.strip(" kB"))
+        key, value = line.split("=", 1)
+        value = value.strip('"')
         info[key] = value
 
     return info
 
-def get_uptime():
-    #uptime conversion
-    value= open('/proc/uptime').read().split(" ")
-    uptime = str(datetime.timedelta(seconds=int(float(value[0])))).split(":",3)    
-
-    return uptime
-
-def get_disk_info():
-    disk = shutil.disk_usage('/')
-    return disk
-
-def get_cpu_info():
-    return os.cpu_count()
-
 def show_status():
-    info = get_memory_info()
-    uptime = get_uptime()
-    disk = get_disk_info()
-    cpu = get_cpu_info()
-    
-    #disk usage
-    disk_usage = (disk.used/disk.total)*100
+    info = status.get_memory_info()
+    uptime = status.get_uptime()
+    disk = status.get_disk_info()
+    cpu = status.get_cpu_info()
+    memory_usage, swap_usage = status.calculate_memory_usage(info)
+    disk_usage = status.calculate_disk_usage(disk)
 
     #kB - MB - GB
     mem_total = info["MemTotal"]/1024/1024
     mem_free = info["MemFree"]/1024/1024
     mem_available = info["MemAvailable"]/1024/1024
-
-    #memory usage
-    memory_usage = ((info["MemTotal"] - info["MemAvailable"])/info["MemTotal"])*100
-    #swap usage
-    swap_usage = ((info["SwapTotal"] - info["SwapFree"])/info["SwapTotal"])*100
 
     print("CPU:", cpu
     , "logical CPUs")
@@ -95,18 +79,6 @@ def show_system():
 
 def show_services():
 	print("Showing system services....")
-
-def get_os_release():
-    #get info
-    data = open('/etc/os-release').read()
-    info = {}
-
-    for line in data.splitlines():
-        key, value = line.split("=", 1)
-        value = value.strip('"')
-        info[key] = value
-
-    return info
 
 args = parser.parse_args()
 
