@@ -2,6 +2,7 @@ import datetime
 import shutil
 import os
 import json
+import time
 
 def get_memory_info():
     with open('/proc/meminfo') as file:
@@ -41,6 +42,25 @@ def get_disk_info():
 def get_cpu_info():
     return os.cpu_count()
 
+def get_cpu_times():
+    with open('/proc/stat') as file:
+        line = file.readline()
+
+    parts = line.split()
+
+    user = int(parts[1])
+    nice = int(parts[2])
+    system = int(parts[3])
+    idle = int(parts[4])
+
+    return user, nice, system, idle
+
+def get_cpu_usage():
+    before = get_cpu_times()
+    time.sleep(1)
+    after = get_cpu_times()
+    return calculate_cpu_usage(before,after)
+
 def calculate_memory_usage(info):
     #memory usage
     memory_usage = ((info["MemTotal"] - info["MemAvailable"])/info["MemTotal"])*100
@@ -58,11 +78,27 @@ def calculate_disk_usage(disk):
     disk_usage = (disk["used"]/disk["total"])*100
     return disk_usage
 
+def calculate_cpu_usage(before,after):
+    before_total = sum(before)
+    after_total = sum(after)
+
+    total_delta = after_total - before_total
+    idle_delta = after[3] - before[3]
+
+    if total_delta ==0:
+        return 0.0
+
+    usage = ((total_delta - idle_delta) / total_delta) * 100
+
+    return usage
+
 def get_status_info():
     info = get_memory_info()
     uptime = get_uptime()
     disk = get_disk_info()
     cpu = get_cpu_info()
+    cpu_usage = get_cpu_usage()
+    load_average = get_load_average()
     memory_usage, swap_usage = calculate_memory_usage(info)
     disk_usage = calculate_disk_usage(disk)
 
@@ -75,9 +111,23 @@ def get_status_info():
         "uptime": uptime,
         "disk":disk,
         "cpu": cpu,
+        "cpu_usage": cpu_usage,
+        "load_average": load_average,
         "memory_usage":memory_usage,
         "swap_usage": swap_usage,
         "disk_usage": disk_usage
+    }
+
+def get_load_average():
+    with open('/proc/loadavg') as file:
+        data = file.read()
+
+    parts = data.split()
+
+    return {
+        "1_minute": float(parts[0]),
+        "5_minutes": float(parts[1]),
+        "15_minutes": float(parts[2])
     }
 
 def show_status(json_status_output):
@@ -92,7 +142,9 @@ def show_status(json_status_output):
         print(json.dumps(data, indent=4))
         return
 
-    print("CPU:", data["cpu"], "logical CPUs")
+    print(f"CPU: {data["cpu"]} logical CPUs")
+    print(f"CPU Usage: {data["cpu_usage"]:.2f} %")
+    print(f"Load Average: " f"{data['load_average']['1_minute']:.2f}, " f"{data['load_average']['5_minutes']:.2f}, " f"{data['load_average']['15_minutes']:.2f}")
     print(f"Memory Total: {mem_total:.2f} GiB")
     print(f"Memory Free: {mem_free:.2f} GiB")
     print(f"Memory Available: {mem_available:.2f} GiB")
@@ -100,3 +152,4 @@ def show_status(json_status_output):
     print(f"Swap Usage: {data["swap_usage"]:.2f} %")
     print(f"Disk Usage: {data["disk_usage"]:.2f} %")
     print(f"Uptime: {data["uptime"]["days"]} days {data["uptime"]["hours"]} hours {data["uptime"]["minutes"]} minutes {data["uptime"]["seconds"]} seconds")
+
