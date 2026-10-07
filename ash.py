@@ -36,4 +36,4 @@ if args.command == "status":
 elif args.command == "system":
 	system.show_system()
 elif args.command == "services":
-	services.show_services()
+	services.show_services(args.failed)

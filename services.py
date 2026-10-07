@@ -7,7 +7,7 @@
 
 import subprocess
 
-def show_services():
+def show_services(failed_only):
     result = subprocess.run(["systemctl", "list-units" ,"--type=service", "--no-pager", "--plain", "--no-legend"], capture_output=True, text=True)
     lines = result.stdout.splitlines()
 
@@ -23,4 +23,7 @@ def show_services():
         parts = line.split(maxsplit=4)
 
         if parts and parts[0].endswith(".service"):
+            if failed_only and parts[2] != "failed":
+                continue
+                
             print(f"{parts[0]:<40} {parts[2]:<7} {parts[3]}")
