@@ -29,6 +29,12 @@ services_parser.add_argument(
     help="Show only failed services"
 )
 
+services_parser.add_argument(
+    "--running",
+    action="store_true",
+    help="Show only running services"
+)
+
 args = parser.parse_args()
 
 if args.command == "status":
@@ -36,4 +42,4 @@ if args.command == "status":
 elif args.command == "system":
 	system.show_system()
 elif args.command == "services":
-	services.show_services(args.failed)
+	services.show_services(args.failed,args.running)
