@@ -92,6 +92,15 @@ def calculate_cpu_usage(before,after):
 
     return usage
 
+def calculate_health(cpu_usage, memory_usage, disk_usage):
+    if cpu_usage >= 90 or memory_usage >= 90 or disk_usage >= 90:
+        return "CRITICAL"
+
+    if cpu_usage >= 70 or memory_usage >= 70 or disk_usage >= 70:
+        return "WARNING"
+
+    return "OK"
+
 def get_status_info():
     info = get_memory_info()
     uptime = get_uptime()
@@ -101,6 +110,7 @@ def get_status_info():
     load_average = get_load_average()
     memory_usage, swap_usage = calculate_memory_usage(info)
     disk_usage = calculate_disk_usage(disk)
+    health = calculate_health(cpu_usage, memory_usage, disk_usage)
 
     return{
         "info": {
@@ -115,7 +125,8 @@ def get_status_info():
         "load_average": load_average,
         "memory_usage":memory_usage,
         "swap_usage": swap_usage,
-        "disk_usage": disk_usage
+        "disk_usage": disk_usage,
+        "health": health
     }
 
 def get_load_average():
@@ -142,14 +153,36 @@ def show_status(json_status_output):
         print(json.dumps(data, indent=4))
         return
 
-    print(f"CPU: {data["cpu"]} logical CPUs")
-    print(f"CPU Usage: {data["cpu_usage"]:.2f} %")
-    print(f"Load Average: " f"{data['load_average']['1_minute']:.2f}, " f"{data['load_average']['5_minutes']:.2f}, " f"{data['load_average']['15_minutes']:.2f}")
+    print(f"Health: {data['health']}")
+    print("---")
+
+    print(f"CPU: {data['cpu']} logical CPUs")
+    print(f"CPU Usage: {data['cpu_usage']:.2f} %")
+    print(
+        f"Load Average: "
+        f"{data['load_average']['1_minute']:.2f}, "
+        f"{data['load_average']['5_minutes']:.2f}, "
+        f"{data['load_average']['15_minutes']:.2f}"
+    )
+
+    print("---")
+
     print(f"Memory Total: {mem_total:.2f} GiB")
     print(f"Memory Free: {mem_free:.2f} GiB")
     print(f"Memory Available: {mem_available:.2f} GiB")
-    print(f"Memory Usage: {data["memory_usage"]:.2f} %")
-    print(f"Swap Usage: {data["swap_usage"]:.2f} %")
-    print(f"Disk Usage: {data["disk_usage"]:.2f} %")
-    print(f"Uptime: {data["uptime"]["days"]} days {data["uptime"]["hours"]} hours {data["uptime"]["minutes"]} minutes {data["uptime"]["seconds"]} seconds")
+    print(f"Memory Usage: {data['memory_usage']:.2f} %")
 
+    print("---")
+
+    print(f"Swap Usage: {data['swap_usage']:.2f} %")
+    print(f"Disk Usage: {data['disk_usage']:.2f} %")
+
+    print("---")
+
+    print(
+        f"Uptime: "
+        f"{data['uptime']['days']} days "
+        f"{data['uptime']['hours']} hours "
+        f"{data['uptime']['minutes']} minutes "
+        f"{data['uptime']['seconds']} seconds"
+    )
