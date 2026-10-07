@@ -3,6 +3,7 @@ import shutil
 import os
 import json
 import time
+import subprocess
 
 def get_memory_info():
     with open('/proc/meminfo') as file:
@@ -41,6 +42,54 @@ def get_disk_info():
 
 def get_cpu_info():
     return os.cpu_count()
+
+def get_network_info():
+    result = subprocess.run(
+        ["ip", "-brief", "addr"],
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        return []
+
+    interfaces = []
+
+    for line in result.stdout.splitlines():
+        parts = line.split()
+
+        if len(parts) < 3:
+            continue
+
+        interface = parts[0]
+        state = parts[1]
+        addresses = parts[2:]
+
+        if interface == "lo":
+            continue
+
+        ipv4 = None
+        ipv6 = None
+
+        for address in addresses:
+            if "/" not in address:
+                continue
+
+            if ":" in address:
+                if ipv6 is None:
+                    ipv6 = address
+            else:
+                if ipv4 is None:
+                    ipv4 = address
+
+        interfaces.append({
+            "interface": interface,
+            "state": state,
+            "ipv4": ipv4,
+            "ipv6": ipv6
+        })
+
+    return interfaces
 
 def get_cpu_times():
     with open('/proc/stat') as file:
@@ -108,6 +157,8 @@ def get_status_info():
     cpu = get_cpu_info()
     cpu_usage = get_cpu_usage()
     load_average = get_load_average()
+    network = get_network_info()
+
     memory_usage, swap_usage = calculate_memory_usage(info)
     disk_usage = calculate_disk_usage(disk)
     health = calculate_health(cpu_usage, memory_usage, disk_usage)
@@ -123,6 +174,7 @@ def get_status_info():
         "cpu": cpu,
         "cpu_usage": cpu_usage,
         "load_average": load_average,
+        "network": network,
         "memory_usage":memory_usage,
         "swap_usage": swap_usage,
         "disk_usage": disk_usage,
@@ -176,6 +228,17 @@ def show_status(json_status_output):
 
     print(f"Swap Usage: {data['swap_usage']:.2f} %")
     print(f"Disk Usage: {data['disk_usage']:.2f} %")
+
+    print("---")
+
+    for network in data["network"]:
+        print(
+            f"Network: {network['interface']} "
+            f"({network['state']})"
+        )
+
+        print(f"IPv4: {network['ipv4']}")
+        print(f"IPv6: {network['ipv6']}")
 
     print("---")
 
