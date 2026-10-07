@@ -7,15 +7,29 @@ parser = argparse.ArgumentParser(description = "A Linux system information CLI."
 
 subparsers = parser.add_subparsers(dest="command")
 
-subparsers.add_parser(
+status_parser = subparsers.add_parser(
 	"status",
 	help="Show system health information",
 	description="Display CPU, memory, disk, uptime, and general system health."
 )
 
-subparsers.add_parser(
+status_parser.add_argument(
+    "--json",
+    dest="json",
+    action="store_true",
+    help="Output status information as JSON"
+)
+
+system_parser = subparsers.add_parser(
 	"system",
 	help="Show system information"
+)
+
+system_parser.add_argument(
+    "--json",
+    dest="json",
+    action="store_true",
+    help="Output system information as JSON"
 )
 
 services_parser = subparsers.add_parser(
@@ -42,8 +56,8 @@ services_group.add_argument(
 args = parser.parse_args()
 
 if args.command == "status":
-	status.show_status()
+	status.show_status(args.json)
 elif args.command == "system":
-	system.show_system()
+	system.show_system(args.json)
 elif args.command == "services":
-	services.show_services(args.failed,args.running)
+	services.show_services(args.failed, args.running)
