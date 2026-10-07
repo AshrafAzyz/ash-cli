@@ -23,14 +23,18 @@ services_parser = subparsers.add_parser(
 	help="Show systemd services"
 )
 
-services_parser.add_argument(
+services_group = services_parser.add_mutually_exclusive_group()
+
+services_group.add_argument(
     "--failed",
+    dest="failed",
     action="store_true",
     help="Show only failed services"
 )
 
-services_parser.add_argument(
+services_group.add_argument(
     "--running",
+    dest="running",
     action="store_true",
     help="Show only running services"
 )
