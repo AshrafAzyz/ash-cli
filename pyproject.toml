@@ -13,7 +13,7 @@ authors = [{name = "Ashraf Aziz", email = "ahmadashrafbinabdulaziz@gmail.com"}]
 keywords= ["linux" ,"cli", "ubuntu", "system-information", "python"]
 
 [project.optional-dependencies]
-dev = ["pytest>=9"]
+dev = ["pytest>=9","pytest-cov>=7"]
 
 [project.urls]
 Homepage = "https://github.com/AshrafAzyz/ash-cli"
