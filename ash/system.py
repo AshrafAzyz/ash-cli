@@ -25,7 +25,7 @@ def get_system_info():
     return {
         "os": info["NAME"],
         "version": info["VERSION_ID"],
-        "codename": info["VERSION_CODENAME"],
+        "codename": info.get("VERSION_CODENAME"),
         "kernel": kernel,
         "architecture": arch,
         "python": python,

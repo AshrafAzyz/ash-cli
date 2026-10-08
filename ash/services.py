@@ -7,8 +7,24 @@
 
 import subprocess
 
-def show_services(failed_only,running_only):
-    result = subprocess.run(["systemctl", "list-units" ,"--type=service", "--no-pager", "--plain", "--no-legend"], capture_output=True, text=True)
+def show_services(failed_only, running_only):
+    try:
+        result = subprocess.run(
+            [
+                "systemctl",
+                "list-units",
+                "--type=service",
+                "--no-pager",
+                "--plain",
+                "--no-legend"
+            ],
+            capture_output=True,
+            text=True
+        )
+    except FileNotFoundError:
+        print("systemctl is not available on this system.")
+        return
+
     lines = result.stdout.splitlines()
 
     if result.returncode != 0:

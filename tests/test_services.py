@@ -150,3 +150,14 @@ def test_running_filter_with_no_running_services(capsys):
     output = capsys.readouterr().out
 
     assert "No running services found" in output
+
+def test_systemctl_not_available(capsys):
+    with patch(
+        "ash.services.subprocess.run",
+        side_effect=FileNotFoundError
+    ):
+        services.show_services(False, False)
+
+    captured = capsys.readouterr()
+
+    assert "systemctl is not available on this system." in captured.out

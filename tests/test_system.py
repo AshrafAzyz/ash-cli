@@ -138,3 +138,34 @@ def test_show_system_json(capsys):
     result = json.loads(output)
 
     assert result == fake_data
+
+def test_get_system_info_without_codename():
+    from unittest.mock import patch
+
+    fake_os_release = {
+        "NAME": "TestOS",
+        "VERSION_ID": "1.0"
+    }
+
+    with patch(
+        "ash.system.get_os_release",
+        return_value=fake_os_release
+    ), patch(
+        "ash.system.platform.release",
+        return_value="6.20.0-test"
+    ), patch(
+        "ash.system.platform.machine",
+        return_value="x86_64"
+    ), patch(
+        "ash.system.platform.python_version",
+        return_value="3.14.4"
+    ), patch(
+        "ash.system.platform.node",
+        return_value="test-machine"
+    ):
+
+        result = system.get_system_info()
+
+    assert result["os"] == "TestOS"
+    assert result["version"] == "1.0"
+    assert result["codename"] is None
