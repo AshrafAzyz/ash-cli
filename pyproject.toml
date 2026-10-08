@@ -6,7 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "ash-cli"
 version = "0.1.0"
 description = "A Linux system information CLI"
+readme = "README.md"
 requires-python = ">3.14"
+license = {file = "LICENSE"}
+author = [
+    {name = "Ashraf Aziz", email = "ahmadashrafbinabdulaziz@gmail.com"}
+]
+keywords= ["linux" ,"cli", "ubuntu", "system-information", "python"]
+
+[project.urls]
+Homepage = "https://github.com/AshrafAzyz/ash-cli"
+Repository = "https://github.com/AshrafAzyz/ash-cli"
+Issues = "https://github.com/AshrafAzyz/ash-cli/issues"
 
 [project.scripts]
 ash = "ash.cli:main"
