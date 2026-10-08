@@ -1,5 +1,3 @@
-Yes. **One single field only**. Replace your entire `README.md` with this:
-
 ```markdown
 # ash-cli
 
