@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import argparse
 
 from . import status
@@ -7,7 +8,13 @@ from . import services
 
 def main():
     parser = argparse.ArgumentParser(
-        description="A Linux system information CLI."
+        description="A Linux system information and management CLI."
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"ash {version('ash-cli')}"
     )
 
     subparsers = parser.add_subparsers(dest="command")
@@ -27,7 +34,8 @@ def main():
 
     system_parser = subparsers.add_parser(
         "system",
-        help="Show system information"
+        help="Show system information",
+        description="Display operating system, kernel, architecture, Python, and hostname information."
     )
 
     system_parser.add_argument(
@@ -39,7 +47,8 @@ def main():
 
     services_parser = subparsers.add_parser(
         "services",
-        help="Show systemd services"
+        help="Show systemd services",
+        description="Display systemd services and their current states."
     )
 
     services_group = services_parser.add_mutually_exclusive_group()

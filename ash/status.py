@@ -44,11 +44,14 @@ def get_cpu_info():
     return os.cpu_count()
 
 def get_network_info():
-    result = subprocess.run(
-        ["ip", "-brief", "addr"],
-        capture_output=True,
-        text=True
-    )
+    try:
+        result = subprocess.run(
+            ["ip", "-brief", "addr"],
+            capture_output=True,
+            text=True
+        )
+    except FileNotFoundError:
+        return []
 
     if result.returncode != 0:
         return []

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>61"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,12 +7,13 @@ name = "ash-cli"
 version = "0.1.0"
 description = "A Linux system information CLI"
 readme = "README.md"
-requires-python = ">3.14"
+requires-python = ">=3.14"
 license = {file = "LICENSE"}
-author = [
-    {name = "Ashraf Aziz", email = "ahmadashrafbinabdulaziz@gmail.com"}
-]
+authors = [{name = "Ashraf Aziz", email = "ahmadashrafbinabdulaziz@gmail.com"}]
 keywords= ["linux" ,"cli", "ubuntu", "system-information", "python"]
+
+[project.optional-dependencies]
+dev = ["pytest>=9"]
 
 [project.urls]
 Homepage = "https://github.com/AshrafAzyz/ash-cli"
