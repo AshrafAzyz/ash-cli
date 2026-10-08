@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ash-cli"
+version = "0.1.0"
+description = "A Linux system information CLI"
+requires-python = ">3.14"
+
+[project.scripts]
+ash = "ash.cli:main"
