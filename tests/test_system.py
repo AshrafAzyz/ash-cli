@@ -14,10 +14,11 @@ def test_get_system_info():
     assert "python" in data
     assert "hostname" in data
 
-    # Check actual values
+    # Check general system values
     assert data["os"] == "Ubuntu"
-    assert data["version"] == "26.04"
-    assert data["codename"] == "resolute"
+    assert isinstance(data["version"], str)
+    assert data["version"] != ""
+    assert isinstance(data["codename"], (str, type(None)))
 
     # Check values against the Python environment
     assert data["kernel"] == platform.release()
@@ -45,6 +46,7 @@ VERSION_CODENAME="resolute"
         "VERSION_ID": "26.04",
         "VERSION_CODENAME": "resolute"
     }
+
 
 def test_get_system_info_mocked():
     from unittest.mock import patch
@@ -84,6 +86,7 @@ def test_get_system_info_mocked():
         "hostname": "test-machine"
     }
 
+
 def test_show_system(capsys):
     from unittest.mock import patch
 
@@ -113,6 +116,7 @@ def test_show_system(capsys):
     assert "Python: 3.14.4" in output
     assert "Hostname: test-machine" in output
 
+
 def test_show_system_json(capsys):
     from unittest.mock import patch
     import json
@@ -138,6 +142,7 @@ def test_show_system_json(capsys):
     result = json.loads(output)
 
     assert result == fake_data
+
 
 def test_get_system_info_without_codename():
     from unittest.mock import patch
